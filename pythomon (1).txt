@@ -1,0 +1,1121 @@
+
+# ----------------------------------------------------------------------
+
+# PYTHOMON, A Python-based Pokemon Game
+
+# INSTRUCTIONS
+
+# To input data, you will need to type in the console log when prompted and
+# press "enter" when submitting the input. An example would be:
+
+# Are you a human? (y/n) -> y
+
+# An optional tutorial is also available upon the game's start.
+# Additionaly, the main menu for traversing the world has unique functions as well.
+
+# Check: Outputs info about all the data relating to the player and progress in the game.
+
+# Battle: Initiates a battle sequence with a random wild Pythomon. (alternative to 'move' option
+# when you need to gain rewards from battle without going further)
+
+# Move: Prompts the user to go forth before initiating a battle sequence and advancing by one tile
+# upon winning the battle. (Also used to challenge gym leaders.)
+
+# Bag: Displays all of the pythomon that the player has caught in battle.
+
+# When in a battle sequence, there are a few options to consider.
+
+# Attack: Executes an attack on the rival pythomon with varying power.
+
+# Run: Executes an attempt to exit the current battle.
+
+# Ability: If available, executes an attack corresponding to your pythomon's type.
+# There are 6 different abilities, so feel free to reset to try and pick your favorite!
+# A compendium of type advantages and abilities is available below in the code.
+
+# There are four areas in the game: Village, Town, City, and Championship.
+# Each has unique Pythomon to discover, and while you can't use them, by collecting
+# all Pythomon in the game you can receive a special badge.
+
+# All in all, have fun!
+
+# ---------------------------------------------------------------------
+
+# Importing all modules
+
+import math
+import time
+import random
+import sys
+
+rivability = False
+# xpbooster decides amt of xp you get.
+# 2 is the normal value for xpbooster
+xpbooster = 1
+extralvl = 0
+# decides the name of the professor
+prof1names = ['Oak','Birch','Elm','Maple','Rose','Olive','Grape','Bush']
+prof2names = ['root','branch','vine','leaf','flower','fruit','tree','grass']
+professor1 = random.choice(prof1names)
+professor2 = random.choice(prof2names)
+profname = (str(professor1) + str(professor2))
+
+# This is where the pythomon types are stored
+typelist = ["String", "Integer", "Float", "Boolean", "Random", "List"]
+
+# Heres a quick compendium of all the type advantages:
+
+# String is weak to Integer and List, but is strong to Float and Random.
+# Integer is weak to Float and Boolean, but is strong to String and List.
+# Float is weak to String and Random, but is strong to Integer and Boolean.
+# Boolean is weak to Random and Float, but is strong to List and Integer.
+# Random is weak to List and String, but is strong to Boolean and Float.
+# List is weak to Boolean and Integer, but is strong to Random and String.
+
+# Below is a description of all the type abilities as well.
+
+# String: Letter Leech
+
+"""
+Over time, the pythomon using this ability will gain a small amount
+of health from the pythomon that this ability was used on. (Less health than Endless Aura,
+but also does damage (less than Death Counter))
+"""
+
+# Integer: Death Counter
+
+"""
+Over time, the pythomon this ability was used on will be hurt by a percentage of
+their health until it dies.
+"""
+
+# Float: Endless Aura
+
+"""
+Over time, the pythomon using this ability will heal a percentage of their health each turn.
+"""
+
+# Boolean: Burning Truth
+
+"""
+The pythomon using this move will take a large amount of the opposing pythomon's health
+in one turn. (more than Letter Leech, but only one turn.)
+"""
+
+# Random: Chaotic Chance
+
+"""
+The pythomon using this move will heal a random amount of health, ranging from small
+amounts to large. (always more than Endless Aura, but only one turn.)
+"""
+
+# List: Sanguine Split
+
+"""
+The pythomon using this move will split the opposing pythomon's health in half.
+(A lot more damage than Death Counter, but dependent on -current- health and 
+only one turn.)
+"""
+
+# This is where field menu options are stored. (use last one for advancing through the game quicker)
+menulist = ["check", "battle", "move","bag","cheatcode"]
+
+# decides some of the town names
+# The first town is ___ Village, second is ___ Town,
+# Third is ___ City, and final one is Victory League.
+
+# Village
+
+villnames1 = ['Humble','Stone','Shade','Pebble','Sea','Soil','Simple','River']
+villnames2 = ['path','root','hut','fence','yard','forest','mud','hill']
+vill1 = random.choice(villnames1)
+vill2 = random.choice(villnames2)
+villname = (str(vill1) + str(vill2) + " Village")
+
+# Town
+
+townnames1 = ['Brick','Cobble','Sky','Boulder','Forest','Earth','Spring','Lake']
+townnames2 = ['path','stone','side','wall','yard','ville','road','view']
+town1 = random.choice(townnames1)
+town2 = random.choice(townnames2)
+townname = (str(town1) + str(town2) + " Town")
+
+# City
+
+citynames1 = ['Grand','Flame','Magma','Boulder','Ocean','Lava','Snow','Lake']
+citynames2 = ['path','steel','peak','core','yard','forest','fall','mountain']
+city1 = random.choice(citynames1)
+city2 = random.choice(citynames2)
+cityname = (str(city1) + str(city2) + " City")
+
+# This is where the location information is stored
+
+location = {
+    "area": 1,
+    "stage": 1
+}
+
+# This is where some of the achievement data is stored
+badgenum = 0
+badges = []
+
+# This is where some of the partner pythomon data is stored
+
+partnerhp = 50
+partnerlevel = 1
+totalxp = 0
+# This is where the list of possible pythomon is stored
+
+villagepythos = ['Dirtball','Sproutling','Wheatley','Huthaunter','Spearwave','Hillbarley','Lilian','Pondler']
+townpythos = ['Musketomb','Blimper','Motorwall','Tidebore','Bearcannon','Wrangleherd','Gatlong']
+citypythos = ['HeavyTF2','Snipurr','Steelscraper','Pidgeonne','Crushclaw','Fangxplode','Nucleore']
+leaguepythos = ['Hauntray','Tunnelboar','Granitear','Tsunamight','Mountank','Misseal','Thunderstomp']
+
+# This is where the index data is stored
+
+bag = []
+
+# Just some code to do with debugging (Making program run faster, ect.)
+
+sleeptime = 0
+
+def sleep(num):
+    global sleeptime
+    if sleeptime == 0:
+        pass
+    else:
+        time.sleep(sleeptime * num)
+
+# this is the opening cutscene
+
+def openingcut():
+    sleeptime = 0.5
+    print("And now,")
+    sleep(1.2)
+    print("The adventure of a lifetime...")
+    sleep(2.4)
+    for i in range(3):
+        print("-")
+        sleep(0.75)
+    print("---------")
+    print("PYTHOMON!")
+    print("---------")
+    sleep(2)
+    entergame = input("Press enter to start.")
+    
+# this is the cutscene where you choose your pythomon
+
+def choosepokemon():
+    print("-")
+    print("-")
+    print("-")
+    print(f'{profname}: Hello, traveler! My name is Professor {profname}.')
+    sleep(1.8)
+    print(f'{profname}: Welcome to the world of Pythomon!')
+    sleep(2.4)
+    print(f'{profname}: Pythomon are amazing creatures that can be found all')
+    print("around the Pytho region.")
+    sleep(2.8)
+    print(f'{profname}: And now, the time has come for you to choose your ')
+    print("very own Pythomon!")
+    sleep(2.8)
+    print(f'{profname}: But first, please tell me ')
+    # decides the name of the player
+    global playername
+    playername = input("your name. (type here) ")
+    print(f'{profname}: {playername}...')
+    sleep(2.4)
+    print(f'{profname}: What a fine name indeed!')
+    sleep(1.5)
+    print(f'{profname}: Now then, {playername}, you must decide the name')
+    # decides name of partner pythomon.
+    global partnername
+    partnername = input("of your pythomon. (Type here) ")
+    type_chosen = 0
+    # now the type of the pythomon will be chosen
+    print(f'{profname}: Pythomon all have different types.')
+    sleep(2.4)
+    print(f'{profname}: Types determine the pythomons abilities and strengths.')
+    sleep(2.4)
+    print(f'{profname}: There are 6 types:')
+    sleep(2.0)
+    print(f'{profname}: String, Integer, Float, Boolean, Random, & List.')
+    sleep(2.8)
+    print(f'{profname}: These types all counter each other in different ways!')
+    sleep(2.4)
+    # loop to choose type until valid type is chosen
+    while type_chosen == 0:
+        global partnertype
+        print(f'{profname}: Now, choose your partners')
+        partnertype = input("type: (type in the name of the type perfectly) ")
+        if not (partnertype in typelist):
+            print(f'{profname}: Are you sure you typed that in correctly?')
+            sleep(2.4)
+        else:
+            bag.append(partnername)
+            type_chosen = 1
+            print(f'{profname}: So to summarize, your Pythomon')
+            print(f'is named {partnername} and is a {partnertype} type.')
+            sleep(2.4)
+            print(f'{profname}: Well then, you are all set, {playername}!')
+            sleep(2.4)
+            print(f'{profname}: From here, head to {villname} where you can fight')
+            print(f'your first Gym Leader, Hogan.')
+            sleep(2.8)
+            print(f'{profname}: Your journey to the Victory League begins now, {playername}!')
+            sleep(2.8)
+            startjourney = input("Press enter to continue. ")
+            print(" ")
+
+def endingcut():
+    global profname
+    global playername
+    sleep(1)
+    print(f'{profname}: Congratulations, {playername}. You are now the Champion of Pytho!')
+    sleep(2.5)
+    print(f'{profname}: With your pokemon, {partnername}, you crushed the likes of Hogan, Vince, Boris & Grant.')
+    sleep(2.5)
+    print(f"{profname}: I'm glad I got to see you progress as a Pythomon Trainer. ")
+    sleep(2.5)
+    print(f"{profname}: Well then, i'm sure you have Champion business to attend to.")
+    sleep(2.5)
+    print(f"{profname}: Goodbye, {playername}!")
+    sleep(2.5)
+    print(" ")
+    print("----------------------")
+    print("Thank you for playing!")
+    print("----------------------")
+    sleep(5)
+    sys.exit()
+    # This signifies the end of the game.
+    
+def hpset():
+    global partnerhp
+    global partnerlevel
+    partnerhp = 50 + (2 * partnerlevel)
+
+def levelset():
+    global partnername
+    global partnerlevel
+    global extralvl
+    if location["area"] == 1:
+        prelvl = totalxp / 50
+        extralvl = math.floor(prelvl)
+        partnerlevel = 1 + extralvl
+    elif location["area"] == 2:
+        prelvl = totalxp / 100
+        extralvl = math.floor(prelvl)
+        partnerlevel = 1 + extralvl
+    elif location["area"] == 3:
+        prelvl = totalxp / 150
+        extralvl = math.floor(prelvl)
+        partnerlevel = 1 + extralvl
+    else:
+        prelvl = totalxp / 200
+        extralvl = math.floor(prelvl)
+        partnerlevel = 1 + extralvl
+    if extralvl > 0:
+        print(f'{partnername} is now level {partnerlevel}!')
+def leaderbattle():
+    global rivability
+    rivability = False
+    global badgenum
+    global partnerlevel
+    global partnerhp
+    hpset()
+    healfield = 0
+    dps = 0
+    leech = 0
+    rivhealfield = 0
+    rivdps = 0
+    rivleech = 0
+    if location["area"] == 1:
+        leadername = "Hogan"
+        leaderphrase = "Hogan: Time to cut you down to size!"
+        rivalpoketype = "String"
+        rivalpokename = "Stingerling"
+        rivalpokehp = 80
+        rivalpokelvl = 15
+    elif location["area"] == 2:
+        leadername = "Vince"
+        leaderphrase = "Vince: You have no chance at beating me!"
+        rivalpoketype = "Float"
+        rivalpokename = "Blingblast"
+        rivalpokehp = 130
+        rivalpokelvl = 30
+    elif location["area"] == 3:
+        leadername = "Boris"
+        leaderphrase = '''Boris: The might of steel outclasses you in every way!'''
+        rivalpoketype = "Boolean"
+        rivalpokename = "Factorite"
+        rivalpokehp = 180
+        rivalpokelvl = 45
+    elif location["area"] == 4:
+        leadername = "Grant"
+        leaderphrase = "Grant: You have come far, but now you will fall."
+        rivalpoketype = "List"
+        rivalpokename = "Drakequake"
+        rivalpokehp = 230
+        rivalpokelvl = 60
+    print(" ")
+    if location["area"] == 4:
+        print("Champion Grant wants to fight!")
+    else:
+        print(f'Gym Leader {leadername} wants to fight!')
+    sleep(2)
+    print(leaderphrase)
+    sleep(3)
+    print(f'{leadername} sent out {rivalpokename}!')
+    sleep(1)
+    print(f'{playername} sent out {partnername}!')
+    sleep(2)
+    print(" ")
+    print("------------")
+    print("BATTLE START")
+    print("------------")
+    print(" ")
+    sleep(2)
+    maxrivhp = rivalpokehp
+    maxhp = partnerhp
+    # Battle Time!
+    # Battle Time!
+    # Battle Time!
+
+
+
+    ability = False
+    rivalattackpower = 0
+    attackpower = 0
+    hpset()
+    earnablexp = rivalpokehp
+    while (partnerhp > 0) and (rivalpokehp > 0):
+        if healfield > 0:
+            partnerhp = partnerhp + healfield
+            print(f'{partnername} was healed for {healfield}HP!')
+        elif leech > 0:
+            rivalpokehp = rivalpokehp - leech
+            partnerhp = partnerhp + leech
+            print(f'{partnername} leeched {leech}HP from {rivalpokename}!')
+        elif dps > 0:
+            rivalpokehp = rivalpokehp - dps
+            print(f'{rivalpokename} took {dps} damage from the death counter!')
+        if (partnerhp < 0) or (rivalpokehp < 0):
+            break
+
+        # this segment handles the abilities of the rival pythomon
+
+        if rivhealfield > 0:
+            rivalpokehp = rivalpokehp + rivhealfield
+            print(f'{rivalpokename} was healed for {rivhealfield}HP!')
+        elif rivleech > 0:
+            partnerhp = partnerhp - rivleech
+            rivalpokehp = rivalpokehp + rivleech
+            print(f'{rivalpokename} leeched {rivleech}HP from {partnername}!')
+        elif rivdps > 0:
+            partnerhp = partnerhp - rivdps
+            print(f'{partnername} took {rivdps} damage from the death counter!')
+        if (partnerhp < 0) or (rivalpokehp < 0):
+            break
+
+        # back to regularly scheduled battling
+
+        print(f'{rivalpokename}: Type = {rivalpoketype}, HP = {rivalpokehp}, LVL = {rivalpokelvl}')
+        print(f'{partnername}: Type = {partnertype}, HP = {partnerhp}, LVL = {partnerlevel}')
+        sleep(0.5)
+        battlechoice = 0
+        choosing = 0
+        while choosing == 0:
+            battlechoice = input("What will you do? (Attack/Run/Ability)").lower()
+            if battlechoice == "attack":
+                ourattack = ((attack(maxhp)) * typematchup(partnertype, rivalpoketype))
+                print(f'{partnername} did {ourattack} damage!')
+                rivalpokehp = rivalpokehp - ourattack
+                sleep(1)
+                choosing = 1
+            elif battlechoice == "run":
+                partnerhp = 0
+                choosing = 1
+            elif battlechoice == "ability":
+                if ability == False:
+                    if partnertype == "String":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("------------")
+                        print("LETTER LEECH")
+                        print("------------")
+                        # this ability takes the rival pytho's health over time and
+                        # adds it to our pythos health
+                        # in general the first three types do EOT abilities and the other
+                        # three do instant abilities
+                        sleep(2)
+                        leech = round(maxhp / 20)
+                        print(f'{partnername} leeched on to {rivalpokename}!')
+                        sleep(2)
+                    elif partnertype == "Integer":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("-------------")
+                        print("DEATH COUNTER")
+                        print("-------------")
+                        sleep(2)
+                        dps = round(maxhp / 10)
+                        print(f'{partnername} initiated a death counter for {rivalpokename}!')
+                        sleep(2)
+                    elif partnertype == "Float":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("------------")
+                        print("ENDLESS AURA")
+                        print("------------")
+                        sleep(2)
+                        healfield = round(maxhp / 10)
+                        print(f'{partnername} started healing itself!')
+                        sleep(2)
+                    elif partnertype == "Boolean":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("-------------")
+                        print("BURNING TRUTH")
+                        print("-------------")
+                        sleep(2)
+                        partnerhp = partnerhp + (rivalpokehp / 4)
+                        rivalpokehp = rivalpokehp - (rivalpokehp / 4)
+                        print(f'{partnername} stole lifeforce from {rivalpokename}!')
+                        sleep(2)
+                    elif partnertype == "Random":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("--------------")
+                        print("CHAOTIC CHANCE")
+                        print("--------------")
+                        sleep(2)
+                        partnerhp = round((random.uniform((partnerhp * 1.5), (partnerhp * 2.5))))
+                        print(f'{partnername} was healed by a random amount!')
+                        sleep(2)
+                    elif partnertype == "List":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("--------------")
+                        print("SANGUINE SPLIT")
+                        print("--------------")
+                        sleep(2)
+                        rivalpokehp = rivalpokehp / 2
+                        print(f'{partnername} split {rivalpokename}s life in half!')
+                        sleep(2)
+                    ability = True
+                    choosing = 1
+                else:
+                    print("You have already used your ability!")
+            else:
+                print("Invalid option!")
+        if rivalpokehp <= (maxrivhp / 2):
+            if not rivability:
+                print(f'Uh oh! {rivalpokename} is gearing up for an ability!')
+                sleep(2)
+                # add in the rival version of abilities here
+                if rivalpoketype == "String":
+                    print(f'{rivalpokename} used its {rivalpoketype} ability!')
+                    sleep(2)
+                    print(" ")
+                    print("------------")
+                    print("LETTER LEECH")
+                    print("------------")
+                    sleep(2)
+                    rivleech = round(maxrivhp / 20)
+                    print(f'{rivalpokename} leeched on to {partnername}!')
+                    sleep(2)
+                    rivability = True
+                elif rivalpoketype == "Integer":
+                    print(f'{rivalpokename} used its {rivalpoketype} ability!')
+                    sleep(2)
+                    print(" ")
+                    print("-------------")
+                    print("DEATH COUNTER")
+                    print("-------------")
+                    sleep(2)
+                    rivdps = round(maxrivhp / 10)
+                    print(f'{rivalpokename} initiated a death counter for {partnername}!')
+                    sleep(2)
+                    rivability = True
+                elif rivalpoketype == "Float":
+                    print(f'{rivalpokename} used its {rivalpoketype} ability!')
+                    sleep(2)
+                    print(" ")
+                    print("------------")
+                    print("ENDLESS AURA")
+                    print("------------")
+                    sleep(2)
+                    rivhealfield = round(maxrivhp / 10)
+                    print(f'{rivalpokename} started healing itself!')
+                    sleep(2)
+                    rivability = True
+                elif rivalpoketype == "Boolean":
+                    print(f'{rivalpokename} used its {rivalpoketype} ability!')
+                    sleep(2)
+                    print(" ")
+                    print("-------------")
+                    print("BURNING TRUTH")
+                    print("-------------")
+                    sleep(2)
+                    rivalpokehp = rivalpokehp + (partnerhp / 4)
+                    partnerhp = partnerhp - (partnerhp / 4)
+                    print(f'{rivalpokename} stole lifeforce from {partnername}!')
+                    sleep(2)
+                    rivability = True
+                elif rivalpoketype == "Random":
+                    print(f'{rivalpokename} used its {rivalpoketype} ability!')
+                    sleep(2)
+                    print(" ")
+                    print("--------------")
+                    print("CHAOTIC CHANCE")
+                    print("--------------")
+                    sleep(2)
+                    rivalpokehp = round((random.uniform((rivalpokehp * 1.5), (rivalpokehp * 2.5))))
+                    print(f'{rivalpokename} was healed by a random amount!')
+                    sleep(2)
+                    rivability = True
+                elif rivalpoketype == "List":
+                    print(f'{rivalpokename} used its {rivalpoketype} ability!')
+                    sleep(2)
+                    print(" ")
+                    print("--------------")
+                    print("SANGUINE SPLIT")
+                    print("--------------")
+                    sleep(2)
+                    partnerhp = partnerhp / 2
+                    print(f'{rivalpokename} split {partnername}s life in half!')
+                    sleep(2)
+                    rivability = True
+                rivability = True
+            else:
+                theirattack = ((attack(maxrivhp)) * typematchup(rivalpoketype, partnertype))
+                print(f'{rivalpokename} attacked for {theirattack} damage!')
+                sleep(1)
+                print(" ")
+                partnerhp = partnerhp - theirattack
+        else:
+            theirattack = ((attack(maxrivhp)) * typematchup(rivalpoketype, partnertype))
+            print(f'{rivalpokename} attacked for {theirattack} damage!')
+            sleep(1)
+            print(" ")
+            partnerhp = partnerhp - theirattack
+
+    if (partnerhp <= 0) & (rivalpokehp > 0):
+        print("You ran away...")
+        sleep(2)
+    else:
+        print("You won!")
+        sleep(2)
+        global totalxp
+        totalxp = totalxp + (earnablexp * 3)
+        print(f'new totalxp is {totalxp}.')
+        sleep(2)
+        levelset()
+        sleep(2)
+        # Battle Ended!
+        # Battle Ended!
+        # Battle Ended!
+        if location["area"] == 1:
+            badges.append("Village Badge")
+            badgenum = badgenum + 1
+            print("You got the Village Badge!")
+            sleep(2)
+            print("Hogan: I got absolutely shredded...")
+            sleep(2)
+            if partnerlevel < 15:
+                partnerlevel = 15
+                totalxp = 750
+                print("Pythomon level auto-increased to 15.")
+                sleep(2)
+            totalxp = totalxp * 2
+
+        elif location["area"] == 2:
+            badges.append("Town Badge")
+            badgenum = badgenum + 1
+            print("You got the Town Badge!")
+            sleep(2)
+            print("Vince: Looks like I didn't put my money where my mouth was...")
+            sleep(2)
+            if partnerlevel < 30:
+                partnerlevel = 30
+                totalxp = 3000
+                print("Pythomon level auto-increased to 30.")
+                sleep(2)
+            totalxp = totalxp * 3
+
+        elif location["area"] == 3:
+            badges.append("City Badge")
+            badgenum = badgenum + 1
+            print("You got the City Badge!")
+            sleep(2)
+            print('''Boris: So you can outmatch even steel... looks like
+            you might just have a shot at the championship!''')
+            sleep(2)
+            if partnerlevel < 45:
+                partnerlevel = 45
+                totalxp = 6750
+                print("Pythomon level auto-increased to 45.")
+                sleep(2)
+            totalxp = totalxp * 4
+
+        elif location["area"] == 4:
+            badges.append("Champion Badge")
+            badgenum = badgenum + 1
+            print("You got the Champion Badge! Congratulations!")
+            sleep(2)
+            print(f'Grant: That was an amazing fight. Good work, {playername}!')
+            sleep(2)
+            endingcut()
+        sleep(2)
+
+        location["area"] = location["area"] + 1
+        location["stage"] = 1
+        if location["area"] == 2:
+            print(f'Entering {townname}!')
+        elif location["area"] == 3:
+            print(f'Entering {cityname}!')
+        elif location["area"] == 4:
+            print(f'Entering the Victory League!')
+        sleep(2)
+specialbadgegotten = False
+def index():
+    villagefound = 0
+    global villagepythos
+    global citypythos
+    global townpythos
+    global leaguepythos
+    global partnername
+    global badges
+    global badgenum
+    townfound = 0
+    cityfound = 0
+    leaguefound = 0
+    print(" ")
+    print(f'Currently, you have {len(bag)} Pythomon in your bag.')
+    sleep(2)
+    sleep(2)
+    for i in range(len(bag)):
+        print(bag[i])
+        sleep(1)
+    sleep(1)
+    if location["area"] == 1:
+        for item in villagepythos:
+            if item in bag:
+                villagefound = villagefound + 1
+        print(f'You have {villagefound}/{len(villagepythos)} Pythomon in this area.')
+    elif location["area"] == 2:
+        for item in townpythos:
+            if item in bag:
+                townfound += 1
+        print(f'You have {townfound}/{len(townpythos)} Pythomon in this area.')
+    elif location["area"] == 3:
+        for item in citypythos:
+            if item in bag:
+                cityfound += 1
+        print(f'You have {cityfound}/{len(citypythos)} Pythomon in this area.')
+    else:
+        for i in range(len(leaguepythos)):
+            if leaguepythos[i] in bag:
+                leaguefound += 1
+        print(f'You have {leaguefound}/{len(leaguepythos)} Pythomon in this area.')
+    sleep(2)
+    totalfound = villagefound + townfound + cityfound + leaguefound
+    totalpyth = len(villagepythos) + len(townpythos) + len(citypythos) + len(leaguepythos)
+    if not totalfound == 0:
+        if totalpyth / totalfound == 1:
+            print(f"In total, you have {totalfound}/{totalpyth} Pythomon. Congratulations, {playername}!")
+            if specialbadgegotten == False:
+                print("You have found all the Pythomon in the Pytho region, and as such,")
+                print("You will recieve a special badge as reward.")
+                print(" ")
+                print("You got the Pytho Badge!")
+                badges.append("Pytho Badge")
+                badgenum += 1
+                specialbadgegotten = True
+            
+        else:
+            print(f"In total, you have {totalfound}/{totalpyth} Pythomon.")
+    else:
+        print(f"In total, you have 0/29 Pythomon.")
+    sleep(2)
+def check():
+    hpset()
+    print(" ")
+    print(f'Player name: {playername}')
+    sleep(1.0)
+    print(f'Badges: {badges}')
+    sleep(1)
+    print(f'Pythomon name: {partnername}')
+    sleep(1)
+    print(f'Pythomon type: {partnertype}')
+    sleep(1)
+    print(f'Pythomon level: {partnerlevel}')
+    sleep(1)
+    print(f'Total XP: {totalxp}')
+    print(f'Pythomon HP: {partnerhp}')
+    sleep(2.4)
+
+def move():
+    print(" ")
+    if location["area"] == 1:
+        print(f'Currently you are in {villname}, stage {location["stage"]}.')
+    elif location["area"] == 2:
+        print(f'Currently you are in {townname}, stage {location["stage"]}.')
+    elif location["area"] == 3:
+        print(f'Currently you are in {cityname}, stage {location["stage"]}.')
+    if location["area"] == 4:
+        print(f'Currently you are in the Victory League, stage {location["stage"]}.')
+    sleep(2)
+    if location["stage"] == 7:
+        print("You are approaching the Gym Leader.")
+        sleep(2)
+        if location["area"] == 1:
+            print(f'For this Gym, level 15 or more is recommended.')
+        elif location["area"] == 2:
+            print(f'For this Gym, level 30 or more is recommended.')
+        if location["area"] == 3:
+            print(f'For this Gym, level 45 or more is recommended.')
+        elif location["area"] == 4:
+            print(f'For the Championship, level 60 or more is recommended.')
+        sleep(2)
+        print("If you have not gotten all pythomon in this area,")
+        sleep(2)
+        print("You will not be able to go back.")
+        sleep(2)
+    move_decision = input("Go forth? (Y/N) ").lower()
+    if move_decision == "y":
+
+        if location["stage"] == 7:
+            moveforth = leaderbattle()
+        else:
+            moveforth = battle()
+            if moveforth == True:
+                location["stage"] = location["stage"] + 1
+    else:
+        print("Staying right here!")
+        sleep(2)
+
+# This function calculates the attack power of a pythomon's move by taking its hp value and then randomizing it
+def rivalattack(rivalhp):
+    rivalattackpower = round(rivalhp / 2) - random.uniform((rivalhp / 4), (rivalhp / 3))
+    return rivalattackpower
+
+def attack(hp):
+    attackpower = round((hp / 2) - (random.uniform((hp / 4), (hp / 3))))
+    return attackpower
+
+def typematchup(typer, rivtyper):
+    print(" ")
+    if typer == "String" and (rivtyper == "Float" or rivtyper == "Random"):
+        print("String is supereffective!")
+        return 1.25
+    elif typer == "String" and (rivtyper == "Integer" or rivtyper == "List"):
+        print("String is not very effective...")
+        return 0.75
+    elif typer == "Integer" and (rivtyper == "String" or rivtyper == "List"):
+        print("Integer is supereffective!")
+        return 1.25
+    elif typer == "Integer" and (rivtyper == "Float" or rivtyper == "Boolean"):
+        print("Integer is not very effective...")
+        return 0.75
+    elif typer == "Float" and (rivtyper == "Integer" or rivtyper == "Boolean"):
+        print("Float is supereffective!")
+        return 1.25
+    elif typer == "Float" and (rivtyper == "String" or rivtyper == "Random"):
+        print("Float is not very effective...")
+        return 0.75
+    elif typer == "Boolean" and (rivtyper == "List" or rivtyper == "Integer"):
+        print("Boolean is supereffective!")
+        return 1.25
+    elif typer == "Boolean" and (rivtyper == "Random" or rivtyper == "Float"):
+        print("Boolean is not very effective...")
+        return 0.75
+    elif typer == "Random" and (rivtyper == "Boolean" or rivtyper == "Float"):
+        print("Random is supereffective!")
+        return 1.25
+    elif typer == "Random" and (rivtyper == "List" or rivtyper == "String"):
+        print("Random is not very effective...")
+        return 0.75
+    elif typer == "List" and (rivtyper == "Random" or rivtyper == "String"):
+        print("List is supereffective!")
+        return 1.25
+    elif typer == "List" and (rivtyper == "Boolean" or rivtyper == "Integer"):
+        print("List is not very effective...")
+        return 0.75
+    else:
+        return 1
+    sleep(2)
+def battle():
+    global xpbooster
+    rivalattackpower = 0
+    attackpower = 0
+    ability = False
+    hpset()
+    healfield = 0
+    dps = 0
+    leech = 0
+    global partnerhp
+    print(" ")
+    if location["area"] == 1:
+        rivalpoketype = random.choice(typelist)
+        rivalpokename = random.choice(villagepythos)
+        rivalpokelvl = random.randint(1, partnerlevel)
+        rivalpokehp = 50 + (2 * rivalpokelvl)
+    if location["area"] == 2:
+        rivalpoketype = random.choice(typelist)
+        rivalpokename = random.choice(townpythos)
+        rivalpokelvl = random.randint(15, partnerlevel)
+        rivalpokehp = 50 + (2 * rivalpokelvl)
+    if location["area"] == 3:
+        rivalpoketype = random.choice(typelist)
+        rivalpokename = random.choice(citypythos)
+        rivalpokelvl = random.randint(30, partnerlevel)
+        rivalpokehp = 50 + (2 * rivalpokelvl)
+    if location["area"] == 4:
+        rivalpoketype = random.choice(typelist)
+        rivalpokename = random.choice(leaguepythos)
+        rivalpokelvl = random.randint(45, partnerlevel)
+        rivalpokehp = 50 + (2 * rivalpokelvl)
+    print(f'A wild {rivalpokename} jumped at you!')
+    earnablexp = rivalpokehp
+    maxrivhp = rivalpokehp
+    maxhp = partnerhp
+    sleep(2)
+    print(f'{playername} sent out {partnername}!')
+    sleep(2)
+    print(" ")
+    print("------------")
+    print("BATTLE START")
+    print("------------")
+    print(" ")
+    sleep(2)
+    while (partnerhp > 0) and (rivalpokehp > 0):
+        if healfield > 0:
+            partnerhp = partnerhp + healfield
+            print(f'{partnername} was healed for {healfield}HP!')
+        elif leech > 0:
+            rivalpokehp = rivalpokehp - leech
+            partnerhp = partnerhp + leech
+            print(f'{partnername} leeched {leech}HP from {rivalpokename}!')
+        elif dps > 0:
+            rivalpokehp = rivalpokehp - dps
+            print(f'{rivalpokename} took {dps} damage from the death counter!')
+        if (partnerhp < 0) or (rivalpokehp < 0):
+            break
+        print(f'{rivalpokename}: Type = {rivalpoketype}, HP = {rivalpokehp}, LVL = {rivalpokelvl}')
+        print(f'{partnername}: Type = {partnertype}, HP = {partnerhp}, LVL = {partnerlevel}')
+        sleep(0.5)
+        battlechoice = 0
+        choosing = 0
+        while choosing == 0:
+            battlechoice = input("What will you do? (Attack/Run/Ability)").lower()
+            if battlechoice == "attack":
+                ourattack = ((attack(maxhp)) * typematchup(partnertype, rivalpoketype))
+                print(f'{partnername} did {ourattack} damage!')
+                rivalpokehp = rivalpokehp - ourattack
+                choosing = 1
+            elif battlechoice == "run":
+                partnerhp = 0
+                choosing = 1
+                break
+            # unfortunately the abilities cant really work with other functions well so
+            # we have to deal with this mess of code :/
+            elif battlechoice == "ability":
+                if ability == False:
+                    if partnertype == "String":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("------------")
+                        print("LETTER LEECH")
+                        print("------------")
+                        # this ability takes the rival pytho's health over time and
+                        # adds it to our pythos health
+                        # in general the first three types do EOT abilities and the other
+                        # three do instant abilities
+                        sleep(2)
+                        leech = round(maxhp / 20)
+                        print(f'{partnername} leeched on to {rivalpokename}!')
+                        sleep(2)
+                    elif partnertype == "Integer":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("-------------")
+                        print("DEATH COUNTER")
+                        print("-------------")
+                        sleep(2)
+                        dps = round(maxhp / 10)
+                        print(f'{partnername} initiated a death counter for {rivalpokename}!')
+                        sleep(2)
+                    elif partnertype == "Float":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("------------")
+                        print("ENDLESS AURA")
+                        print("------------")
+                        sleep(2)
+                        healfield = round(maxhp / 10)
+                        print(f'{partnername} started healing itself!')
+                        sleep(2)
+                    elif partnertype == "Boolean":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("-------------")
+                        print("BURNING TRUTH")
+                        print("-------------")
+                        sleep(2)
+                        partnerhp = partnerhp + (rivalpokehp / 4)
+                        rivalpokehp = rivalpokehp - (rivalpokehp / 4)
+                        print(f'{partnername} stole lifeforce from {rivalpokename}!')
+                        sleep(2)
+                    elif partnertype == "Random":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("--------------")
+                        print("CHAOTIC CHANCE")
+                        print("--------------")
+                        sleep(2)
+                        partnerhp = round((random.uniform((partnerhp * 1.5), (partnerhp * 2.5))))
+                        print(f'{partnername} was healed by a random amount!')
+                        sleep(2)
+                    elif partnertype == "List":
+                        print(f'{partnername} used its {partnertype} ability!')
+                        sleep(2)
+                        print(" ")
+                        print("--------------")
+                        print("SANGUINE SPLIT")
+                        print("--------------")
+                        sleep(2)
+                        rivalpokehp = rivalpokehp / 2
+                        print(f'{partnername} split {rivalpokename}s life in half!')
+                        sleep(2)
+                    ability = True
+                    choosing = 1
+                else:
+                    print("You already used your ability!")
+            else:
+                print("Invalid option!")
+        sleep(1)
+        theirattack = ((attack(maxrivhp)) * typematchup(rivalpoketype, partnertype))
+        print(f'{rivalpokename} attacked for {theirattack} damage!')
+        sleep(1)
+        partnerhp = partnerhp - theirattack
+    if (partnerhp <= 0) & (rivalpokehp > 0):
+        print("You ran away...")
+        return False
+        sleep(2)
+        print(" ")
+        print("---------------")
+    else:
+        print("You won!")
+        global totalxp
+        totalxp = totalxp + (earnablexp * xpbooster)
+        print(f'new totalxp is {totalxp}.')
+        levelset()
+        sleep(2)
+        bag.append(rivalpokename)
+        print(f'{rivalpokename} was added to your bag.')
+        return True
+def menu():
+    global menuoption
+    global partnername
+    menuoption = 'e'
+    while not menuoption in menulist:
+        print(" ")
+        menuoption = input("Choose what to do. (Check/Battle/Move/Bag)").lower()
+        if not menuoption in menulist:
+            print("Invalid option!")
+        elif menuoption == "check":
+            check()
+        elif menuoption == "move":
+            move()
+        elif menuoption == "battle":
+            battle()
+        elif menuoption == "bag":
+            index()
+        elif menuoption == "cheatcode":
+            print(" ")
+            print("Hehehehe... you're a sneaky one!")
+            print(" ")
+            sleep(2)
+            print("Oh well. As a reward for finding my secret code,")
+            sleep(2)
+            print("I grant you power beyond your comprehension!")
+            sleep(2)
+            global partnerlevel
+            global totalxp
+            totalxp = totalxp + 1000000
+            print(' ')
+            print(f'totalxp is now {totalxp}.')
+            sleep(0.5)
+            levelset()
+            sleep(0.5)
+            location["stage"] = 7
+            print(f'Teleported to stage 7.')
+            sleep(2)
+            print(' ')
+            print('Keeheehee... have fun!')
+            sleep(2)
+def tutorial():
+    print('Ok, jumping into the tutorial!')
+    sleep(2)
+    print(" ")
+    print(" ")
+    print(" ")
+    print("Pythomon, as you may have guessed, is a text-based game.")
+    sleep(2)
+    print("Pretty much all decisions are made by entering y, n, or other given")
+    print("commands into the console and pressing enter.")
+    sleep(2)
+    tutchosen = False
+    while tutchosen == False:
+        given = input("Respond to this prompt with 'ok'. ").lower()
+        if given == 'ok':
+            tutchosen = True
+        else:
+            print("Wrong, try again.")
+            sleep(0.5)
+    print(" ")
+    print("Very good! On top of simple yes/no prompts, there are also menus like (x/y/z)")
+    print("where you must respond with x, y or z. (If a program asks you to type an input")
+    print("EXACTLY, then make sure to type it in exactly as it is given in the console.)")
+    sleep(4)
+    print(" ")
+    print("Well, that pretty much covers the tutorial.")
+    print(" ")
+    sleep(1)
+print("Would you like to use the sleep function?")
+print("The sleep function adds dramatic pauses to certain events,")
+print("but will heavily increase runtime.")
+sleepchose = input("Press y or n and then press enter to decide. ").lower()
+if sleepchose == "y":
+    print('sleep function has been enabled.')
+    sleeptime = 1
+elif sleepchose == 'n':
+    print('The sleep function was not enabled.')
+    sleeptime = 0
+else:
+    print('invalid response - disabling sleep by default.')
+tutorialchoose = input("Do you want to go through the tutorial? (y/n) ").lower()
+if tutorialchoose == 'y':
+    tutorial()
+elif tutorialchoose == 'n':
+    print("Ok, heading straight into the game.")
+    sleep(2)
+else:
+    print("Invalid option, heading into the tutorial by default.")
+    tutorial()
+openingcut()
+choosepokemon()
+for i in range(1000):
+    menu()
